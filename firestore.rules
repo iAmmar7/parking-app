@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+   match /databases/{database}/documents {
+    match /users/{userId} {
+     allow write: if request.auth != null && request.auth.uid == userId;
+     allow read: if request.auth != null;
+    }
+    match /locations/{locationId} {
+     allow create, write: if request.auth != null && isAdmin(request.auth.uid);
+     allow read: if request.auth != null;
+    }
+    match /reservations/{reservationId} {
+     allow write: if request.auth != null;
+     allow read: if request.auth != null;
+    }
+    match /parkingspots/{parkingspotId} {
+     allow write: if request.auth != null;
+     allow read: if request.auth != null;
+    }
+    match /users/{userId} {
+     allow write: if request.auth != null && updateAdmin(request.auth.uid) == false;
+     allow read: if request.auth != null;
+    }
+  
+  }
+  match /{document=**} {
+      allow read: if request.auth != null;
+  }
+  function updateAdmin(userId){
+  	return request.resource.data.admin != null
+  }
+  function isAdmin(userId){
+    	return get(/databases/$(database)/documents/users/$(userId)).data.admin == true
+  }
+}
