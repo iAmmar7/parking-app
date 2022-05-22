@@ -100,10 +100,10 @@ exports.spotReservation = functions.region(REGION).https.onCall(async (data, con
   }
   const response = await batch.commit();
 
-  context.send({
+  return {
     response,
     totalReservations: response.length,
     failToReserve: reservedSpots.length,
     message: `${response.length} parking spots have been reserved!`,
-  });
+  };
 });
