@@ -34,7 +34,7 @@ exports.testAuthFunction = functions.region(REGION).https.onCall(async (data, co
 });
 
 // @name: spotReservation
-// @description: To book a spot for parking
+// @description: Book multiple spots for parking
 // @auth: Required
 // @request: { data: { from: date, to: date, parkingSpotId: string } }
 // @response: { response: [], totalReservation: int, failToReserve: int, message: string }
