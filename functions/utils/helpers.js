@@ -1,6 +1,7 @@
+const isValid = require('date-fns/isValid');
+
 const isValidDate = (date) => {
-  const parsedDate = Date.parse(date);
-  return (isNaN(date) && !isNaN(parsedDate));
+  return isValid(new Date(date));
 };
 
 module.exports = { isValidDate };

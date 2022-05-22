@@ -1,15 +1,24 @@
+/* eslint-disable prettier/prettier */
 module.exports = {
   root: true,
   env: {
     es2017: true,
     node: true,
   },
-  extends: [
-    'eslint:recommended',
-    'google',
-  ],
+  extends: ['eslint:recommended', 'google', 'prettier'],
+  plugins: ['prettier'],
   rules: {
-    'quotes': ['error', 'single'],
+    'prettier/prettier': [
+      'error',
+      {
+        printWidth: 120,
+        tabWidth: 2,
+        jsxSingleQuote: true,
+        trailingComma: 'all',
+        singleQuote: true,
+      },
+    ],
+    quotes: ['error', 'single'],
     'max-len': ['error', { code: 120 }],
     'object-curly-spacing': ['error', 'always'],
   },
