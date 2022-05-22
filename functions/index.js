@@ -39,15 +39,12 @@ exports.testAuthFunction = functions.region(REGION).https.onCall(async (data, co
 // @request: { data: { from: date, to: date, parkingSpotId: string } }
 // @response: { response: [], totalReservation: int, failToReserve: int, message: string }
 exports.spotReservation = functions.region(REGION).https.onCall(async (data, context) => {
-  console.log('here1');
   if (!context.auth) {
     throw new functions.https.HttpsError(UNAUTHENTICATED, 'You are not authorized!');
   }
-  console.log('here2');
 
   const { isValid, message } = validateSpotReservation(data);
   if (!isValid) throw new functions.https.HttpsError(INVALID_ARGUMENT, message);
-  console.log('here3');
 
   const { to, from, parkingSpotId } = data;
   const parkingRef = db().collection('parkingspots');
