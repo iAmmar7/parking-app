@@ -33,6 +33,20 @@ exports.testAuthFunction = functions.region(REGION).https.onCall(async (data, co
   return snapshot.docs.map((doc) => doc.data());
 });
 
+// @name: createUserEntry
+// @description: A background trigger to set fields on user creation
+exports.createUserEntry = functions
+  .region(REGION)
+  .auth.user()
+  .onCreate((user) => {
+    return db().collection('users').doc(user.uid).set({
+      eMail: user.email,
+      id: user.uid,
+      firstName: '',
+      lastName: '',
+    });
+  });
+
 // @name: spotReservation
 // @description: Book multiple spots for parking
 // @auth: Required
