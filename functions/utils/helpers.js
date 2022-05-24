@@ -26,8 +26,8 @@ const isEmpty = (arg) => {
   return false;
 };
 
-const isValidDate = (date) => {
+const isValidDateTime = (date) => {
   return isValid(new Date(date));
 };
 
-module.exports = { isValidDate, isNull, isUndefined, isArray, isObject, isEmpty };
+module.exports = { isValidDateTime, isNull, isUndefined, isArray, isObject, isEmpty };

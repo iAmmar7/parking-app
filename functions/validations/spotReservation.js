@@ -1,23 +1,34 @@
-const { isValidDate } = require('../utils/helpers');
+const isSameDay = require('date-fns/isSameDay');
+const isEqual = require('date-fns/isEqual');
+
+const { isValidDateTime, isEmpty } = require('../utils/helpers');
 
 /**
  * Validate the spotReservation function request.
- * @param {object} data The request payload.
+ * @param {object} payload The request payload.
  * @return {object} The error message or null.
  */
-function validateSpotReservation(data) {
-  const { to, from, parkingSpotId } = data;
+function validateSpotReservation(payload) {
+  const { from, until, parkingSpotId } = payload;
 
-  if (!to || !from || !parkingSpotId) {
+  if (isEmpty(until) || isEmpty(from) || isEmpty(parkingSpotId)) {
     return { isValid: false, message: 'Payload has missing values!' };
   }
 
-  if (!isValidDate(to)) {
+  if (!isValidDateTime(from)) {
     return { isValid: false, message: 'Invalid start date!' };
   }
 
-  if (!isValidDate(from)) {
+  if (!isValidDateTime(until)) {
     return { isValid: false, message: 'Invalid end date!' };
+  }
+
+  if (!isSameDay(new Date(from), new Date(until))) {
+    return { isValid: false, message: 'Day should be same for both dates!' };
+  }
+
+  if (isEqual(new Date(from), new Date(until))) {
+    return { isValid: false, message: 'From and until date times should not be same!' };
   }
 
   return { isValid: true, message: null };

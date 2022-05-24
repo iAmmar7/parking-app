@@ -1,11 +1,11 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const isAfter = require('date-fns/isAfter');
-const addDays = require('date-fns/addDays');
+const areIntervalsOverlapping = require('date-fns/areIntervalsOverlapping');
 
 const { validateSpotReservation } = require('./validations');
 const { REGION, UNAUTHENTICATED, INVALID_ARGUMENT, NO_PERMISSION } = require('./utils/constants');
 const errorMessage = require('./utils/errors');
+const { isEmpty } = require('./utils/helpers');
 
 admin.initializeApp();
 const db = admin.firestore;
@@ -40,7 +40,7 @@ exports.createUserEntry = functions
   .auth.user()
   .onCreate((user) => {
     return db().collection('users').doc(user.uid).set({
-      eMail: user.email,
+      email: user.email,
       id: user.uid,
       firstName: '',
       lastName: '',
@@ -48,19 +48,19 @@ exports.createUserEntry = functions
   });
 
 // @name: spotReservation
-// @description: Book multiple spots for parking
+// @description: Book a spot for parking
 // @auth: Required
-// @request: { data: { from: date, to: date, parkingSpotId: string } }
+// @request: { data: { from: date, until: date, parkingSpotId: string } }
 // @response: { response: [], totalReservation: int, failToReserve: int, message: string }
 exports.spotReservation = functions.region(REGION).https.onCall(async (data, context) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError(UNAUTHENTICATED, 'You are not authorized!');
+    throw new functions.https.HttpsError(UNAUTHENTICATED, errorMessage.NOT_AUTHORIZED);
   }
 
   const { isValid, message } = validateSpotReservation(data);
   if (!isValid) throw new functions.https.HttpsError(INVALID_ARGUMENT, message);
 
-  const { to, from, parkingSpotId } = data;
+  const { from, until, parkingSpotId } = data;
   const parkingRef = db().collection('parkingspots');
   const reservedRef = db().collection('reservations');
 
@@ -69,16 +69,22 @@ exports.spotReservation = functions.region(REGION).https.onCall(async (data, con
     throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.PARKING_NOT_FOUND);
   }
   const parkingSpot = spotDoc.data();
-  if (parkingSpot.disabledParking || parkingSpot.allwaysReservedForId || !parkingSpot.active) {
-    throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.NO_PARKING_PERMISSION);
+  if (parkingSpot.disabledParking || !parkingSpot.active) {
+    throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.DISABLED_PARKING_SPOT);
+  }
+  if (!isEmpty(parkingSpot.allwaysReservedForIds) && !parkingSpot.allwaysReservedForIds.includes(context.auth.uid)) {
+    throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.PERMANENT_RESERVATION);
   }
 
-  const startDate = db.Timestamp.fromDate(new Date(from));
-  const endDate = db.Timestamp.fromDate(new Date(to));
+  const startOfDay = new Date(from);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(until);
+  endOfDay.setHours(23, 59, 59, 999);
+
   const reservedSnapshot = await reservedRef
-    .where('spotNumber', '==', parkingSpot.parkingSpotNumber)
-    .where('date', '>=', startDate)
-    .where('date', '<=', endDate)
+    .where('parkingSpotId', '==', parkingSpotId)
+    .where('from', '>=', db.Timestamp.fromDate(startOfDay))
+    .where('from', '<=', db.Timestamp.fromDate(endOfDay))
     .get();
 
   const reservedSpots = [];
@@ -87,37 +93,38 @@ exports.spotReservation = functions.region(REGION).https.onCall(async (data, con
     reservedSpots.push(docData);
   });
 
-  const batch = db().batch();
-  let iterationDate = startDate.toDate();
-  while (!isAfter(iterationDate, endDate.toDate())) {
-    const newReservation = db().collection('reservations').doc();
+  if (!isEmpty(reservedSpots)) {
+    for (let i = 0; i < reservedSpots.length; i++) {
+      const docFrom = reservedSpots[i].from;
+      const docUntil = reservedSpots[i].until;
+      const requestFrom = new Date(from);
+      const requestUntil = new Date(until);
 
-    const dateExist = reservedSpots.findIndex((reservedDate) => {
-      const timestamp = new db.Timestamp(reservedDate.date._seconds, reservedDate.date._nanoseconds);
-      const reservedDateFormat = new Date(timestamp.toDate().toDateString());
-      const iterationDateFormat = new Date(iterationDate.toDateString());
-      return reservedDateFormat.valueOf() === iterationDateFormat.valueOf();
-    });
-
-    if (dateExist < 0) {
-      const payload = {
-        locationId: parkingSpot.locationId,
-        spotNumber: parkingSpot.parkingSpotNumber,
-        userId: context.auth.uid,
-        date: db.Timestamp.fromDate(new Date(iterationDate)),
-        createdAt: db.Timestamp.fromDate(new Date()),
-      };
-      batch.set(newReservation, payload);
+      const isOverLapping = areIntervalsOverlapping(
+        { start: docFrom, end: docUntil },
+        { start: requestFrom, end: requestUntil },
+      );
+      if (!reservedSpots[i].cancelled && isOverLapping) {
+        return {
+          errorMessage: errorMessage.TIME_OVERLAPPING,
+          reservedSpots,
+        };
+      }
     }
-
-    iterationDate = addDays(iterationDate, 1);
   }
-  const response = await batch.commit();
 
-  return {
-    response,
-    totalReservations: response.length,
-    failToReserve: reservedSpots.length,
-    message: `${response.length} parking spots have been reserved!`,
+  const payload = {
+    cancelled: false,
+    createdAt: db.Timestamp.fromDate(new Date()),
+    from: db.Timestamp.fromDate(new Date(from)),
+    until: db.Timestamp.fromDate(new Date(until)),
+    label: parkingSpot.parkingSpotNumber,
+    locationId: parkingSpot.locationId,
+    parkingSpotId: parkingSpot.id,
+    userId: context.auth.uid,
   };
+
+  const res = await reservedRef.add(payload);
+
+  return Object.assign(payload, { uid: res.id });
 });
