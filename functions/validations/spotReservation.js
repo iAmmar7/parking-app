@@ -6,7 +6,7 @@ const { isValidDateTime, isEmpty } = require('../utils/helpers');
 /**
  * Validate the spotReservation function request.
  * @param {object} payload The request payload.
- * @return {object} The error message or null.
+ * @return {object} The validity flag with error message or null.
  */
 function validateSpotReservation(payload) {
   const { from, until, parkingSpotId } = payload;
