@@ -104,7 +104,7 @@ exports.spotReservation = functions.region(REGION).https.onCall(async (data, con
         { start: docFrom, end: docUntil },
         { start: requestFrom, end: requestUntil },
       );
-      if (!reservedSpots[i].cancelled && isOverLapping) {
+      if (!reservedSpots[i].canceled && isOverLapping) {
         return {
           errorMessage: errorMessage.TIME_OVERLAPPING,
           reservedSpots,
@@ -114,11 +114,11 @@ exports.spotReservation = functions.region(REGION).https.onCall(async (data, con
   }
 
   const payload = {
-    cancelled: false,
+    canceled: false,
     createdAt: db.Timestamp.fromDate(new Date()),
     from: db.Timestamp.fromDate(new Date(from)),
     until: db.Timestamp.fromDate(new Date(until)),
-    label: parkingSpot.parkingSpotNumber,
+    label: parkingSpot.parkingSpotNumber.toString(),
     locationId: parkingSpot.locationId,
     parkingSpotId: parkingSpot.id,
     userId: context.auth.uid,
