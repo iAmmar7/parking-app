@@ -53,6 +53,8 @@ exports.createUserEntry = functions
 // @request: { data: { from: date, until: date, parkingSpotId: string } }
 // @response: { reservation: {} }
 exports.spotReservation = functions.region(REGION).https.onCall(async (data, context) => {
+  functions.logger.log('Request payload', data);
+
   if (!context.auth) {
     throw new functions.https.HttpsError(UNAUTHENTICATED, errorMessage.NOT_AUTHORIZED);
   }
