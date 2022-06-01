@@ -58,8 +58,8 @@ module.exports = async (data, context, { functions, db }) => {
 
   if (!isEmpty(reservedSpots)) {
     for (let i = 0; i < reservedSpots.length; i++) {
-      const docFrom = reservedSpots[i].from;
-      const docUntil = reservedSpots[i].until;
+      const docFrom = reservedSpots[i].from.toDate();
+      const docUntil = reservedSpots[i].until.toDate();
       const requestFrom = new Date(from);
       const requestUntil = new Date(until);
 
