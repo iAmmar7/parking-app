@@ -32,7 +32,7 @@ module.exports = async (data, context, { functions, db }) => {
     throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.PARKING_NOT_FOUND);
   }
   const parkingSpot = spotDoc.data();
-  if (parkingSpot.disabledParking || !parkingSpot.active) {
+  if (!parkingSpot.active) {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.DISABLED_PARKING_SPOT);
   }
   if (!isEmpty(parkingSpot.allwaysReservedForIds) && !parkingSpot.allwaysReservedForIds.includes(context.auth.uid)) {
@@ -78,6 +78,7 @@ module.exports = async (data, context, { functions, db }) => {
 
   const payload = {
     canceled: false,
+    isHandicappedParking: false,
     createdAt: db.Timestamp.fromDate(new Date()),
     from: db.Timestamp.fromDate(new Date(from)),
     until: db.Timestamp.fromDate(new Date(until)),
