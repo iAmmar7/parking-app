@@ -35,7 +35,7 @@ module.exports = async (data, context, { functions, db }) => {
   if (!parkingSpot.active) {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.DISABLED_PARKING_SPOT);
   }
-  if (!isEmpty(parkingSpot.allwaysReservedForIds) && !parkingSpot.allwaysReservedForIds.includes(context.auth.uid)) {
+  if (!isEmpty(parkingSpot.alwaysReservedForIds) && !parkingSpot.alwaysReservedForIds.includes(context.auth.uid)) {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.PERMANENT_RESERVATION);
   }
 
