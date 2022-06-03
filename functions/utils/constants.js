@@ -3,4 +3,5 @@ module.exports = {
   UNAUTHENTICATED: 'unauthenticated',
   INVALID_ARGUMENT: 'invalid-argument',
   NO_PERMISSION: 'permission-denied',
+  UNKNOWN: 'unknown',
 };
