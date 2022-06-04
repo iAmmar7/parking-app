@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 module.exports = {
   root: true,
   env: {
@@ -7,6 +6,9 @@ module.exports = {
   },
   extends: ['eslint:recommended', 'google', 'prettier'],
   plugins: ['prettier'],
+  parser: {
+    ecmaVersion: 2018,
+  },
   rules: {
     'prettier/prettier': [
       'error',

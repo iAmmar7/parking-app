@@ -82,7 +82,7 @@ module.exports = async (data, context, { functions, db }) => {
     createdAt: db.Timestamp.fromDate(new Date()),
     from: db.Timestamp.fromDate(new Date(from)),
     until: db.Timestamp.fromDate(new Date(until)),
-    label: parkingSpot.parkingSpotNumber.toString(),
+    label: parkingSpot.parkingSpotNumber?.toString(),
     locationId: parkingSpot.locationId,
     parkingSpotId: parkingSpot.id,
     userId: context.auth.uid,
