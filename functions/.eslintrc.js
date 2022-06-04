@@ -6,9 +6,6 @@ module.exports = {
   },
   extends: ['eslint:recommended', 'google', 'prettier'],
   plugins: ['prettier'],
-  parser: {
-    ecmaVersion: 2018,
-  },
   rules: {
     'prettier/prettier': [
       'error',
