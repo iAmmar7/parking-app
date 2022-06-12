@@ -3,7 +3,7 @@ const errorMessage = require('../utils/errors');
 const { validateToggleAdminState } = require('../validations');
 
 /**
- * Toggle the admin state of user.
+ * Delete the user and future reservation.
  * @auth Required
  * @param {object} data The request payload.
  * @param {object} context The firebase context.
@@ -22,6 +22,7 @@ module.exports = async (data, context, { functions, db, admin }) => {
 
   const { userId } = data;
   const usersRef = db().collection('users');
+  const reservationsRef = db().collection('reservations');
 
   // Decline if the requester is not an admin
   const requesterSnapshot = await usersRef.doc(context.auth.uid).get();
@@ -32,19 +33,30 @@ module.exports = async (data, context, { functions, db, admin }) => {
 
   // Decline if the user does not exist
   const userSnapshot = await usersRef.doc(userId).get();
+  const userData = userSnapshot.data();
   if (!userSnapshot.exists) {
     throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.USER_NOT_FOUND);
   }
 
-  const userDoc = userSnapshot.data();
-  const newAdminState = { admin: !userDoc.admin };
+  await admin.auth().deleteUser(userData.id);
 
-  if (userDoc.admin) {
-    await admin.auth().setCustomUserClaims(userDoc.id, { role: 'user' });
-  } else {
-    await admin.auth().setCustomUserClaims(userDoc.id, { role: 'admin' });
-  }
-  await usersRef.doc(userId).update(newAdminState);
+  const batch = db.batch();
 
-  return Object.assign(userDoc, newAdminState);
+  const reservedSnapshot = await reservationsRef
+    .where('userId', '==', userId)
+    .where('canceled', '==', false)
+    .where('from', '>', db.Timestamp.fromDate(new Date()))
+    .get();
+
+  reservedSnapshot.forEach((doc) => {
+    const canceledReservationRef = reservationsRef.doc(doc.id);
+    batch.update(canceledReservationRef, { canceled: true });
+  });
+
+  const deactivatedUserRef = usersRef.doc(userId);
+  batch.update(deactivatedUserRef, { active: false });
+
+  await batch.commit();
+
+  return Object.assign(userData, { active: false });
 };

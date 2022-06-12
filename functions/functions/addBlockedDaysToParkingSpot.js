@@ -11,7 +11,7 @@ const { validateAddBlockedDaysToParkingSpot } = require('../validations');
  * @param {object} FirebaseRef functions and db reference.
  * @return {object} reservation object.
  */
-module.exports = async (data, context, { functions, db, admin }) => {
+module.exports = async (data, context, { functions, db }) => {
   functions.logger.log('Request payload', data);
 
   if (!context.auth) {
@@ -22,12 +22,14 @@ module.exports = async (data, context, { functions, db, admin }) => {
   if (!isValid) throw new functions.https.HttpsError(INVALID_ARGUMENT, message);
 
   const { parkingSpotId, blockedOn } = data;
+  const usersRef = db().collection('users');
   const spotRef = db().collection('parkingspots');
   const reservedRef = db().collection('reservations');
 
   // Decline if the requester is not an admin
-  const requester = await admin.auth().getUser(context.auth.uid);
-  if (requester.customClaims.role !== 'admin') {
+  const requesterSnapshot = await usersRef.doc(context.auth.uid).get();
+  const requester = requesterSnapshot.data();
+  if (!requester.admin) {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.ONLY_ADMINS);
   }
 

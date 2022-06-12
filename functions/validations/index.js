@@ -4,6 +4,7 @@ const validateCreateInvitation = require('./createInvitation');
 const validateCreateUserThroughInvitation = require('./createUserThroughInvitation');
 const validateAddBlockedDaysToParkingSpot = require('./addBlockedDaysToParkingSpot');
 const validateToggleAdminState = require('./toggleAdminState');
+const validateDeleteUser = require('./deleteUser');
 
 module.exports = {
   validateSpotReservation,
@@ -12,4 +13,5 @@ module.exports = {
   validateCreateUserThroughInvitation,
   validateAddBlockedDaysToParkingSpot,
   validateToggleAdminState,
+  validateDeleteUser,
 };

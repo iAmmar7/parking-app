@@ -11,5 +11,6 @@ module.exports = (db, user) => {
     firstName: '',
     lastName: '',
     admin: false,
+    active: true,
   });
 };
