@@ -37,7 +37,7 @@ exports.cancelReservation = functions.region(REGION).https.onCall((data, context
 });
 
 exports.createInvitation = functions.region(REGION).https.onCall((data, context) => {
-  return createInvitation(data, context, { functions, db });
+  return createInvitation(data, context, { functions, db, admin });
 });
 
 exports.createUserThroughInvitation = functions.region(REGION).https.onCall((data, context) => {
@@ -45,11 +45,11 @@ exports.createUserThroughInvitation = functions.region(REGION).https.onCall((dat
 });
 
 exports.addBlockedDaysToParkingSpot = functions.region(REGION).https.onCall((data, context) => {
-  return addBlockedDaysToParkingSpot(data, context, { functions, db });
+  return addBlockedDaysToParkingSpot(data, context, { functions, db, admin });
 });
 
 exports.toggleAdminState = functions.region(REGION).https.onCall((data, context) => {
-  return toggleAdminState(data, context, { functions, db });
+  return toggleAdminState(data, context, { functions, db, admin });
 });
 
 /**

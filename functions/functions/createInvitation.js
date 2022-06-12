@@ -18,7 +18,7 @@ const { validateCreateInvitation } = require('../validations');
  * @param {object} FirebaseRef functions and db reference.
  * @return {object} inivitation object.
  */
-module.exports = async (data, context, { functions, db }) => {
+module.exports = async (data, context, { functions, db, admin }) => {
   functions.logger.log('Request payload', data);
 
   if (!context.auth) {
@@ -35,9 +35,8 @@ module.exports = async (data, context, { functions, db }) => {
   const invitationsRef = db().collection('invitations');
 
   // Decline if the inviter is not an admin
-  const inviterSnapshot = await usersRef.doc(context.auth.uid).get();
-  const inviter = inviterSnapshot.data();
-  if (!inviter.admin) {
+  const inviter = await admin.auth().getUser(context.auth.uid);
+  if (inviter.customClaims.role !== 'admin') {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.ONLY_ADMINS_CAN_INVITE);
   }
 

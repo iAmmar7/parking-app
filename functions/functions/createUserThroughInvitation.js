@@ -1,10 +1,4 @@
-const {
-  UNAUTHENTICATED,
-  INVALID_ARGUMENT,
-  ALREADY_EXIST,
-  INVITATION_STATUS,
-  NO_PERMISSION,
-} = require('../utils/constants');
+const { INVALID_ARGUMENT, ALREADY_EXIST, INVITATION_STATUS, NO_PERMISSION } = require('../utils/constants');
 const errorMessage = require('../utils/errors');
 const { validateCreateUserThroughInvitation } = require('../validations');
 
@@ -18,10 +12,6 @@ const { validateCreateUserThroughInvitation } = require('../validations');
  */
 module.exports = async (data, context, { functions, db, admin }) => {
   functions.logger.log('Request payload', data);
-
-  if (!context.auth) {
-    throw new functions.https.HttpsError(UNAUTHENTICATED, errorMessage.NOT_AUTHORIZED);
-  }
 
   const { isValid, message } = validateCreateUserThroughInvitation(data);
   if (!isValid) throw new functions.https.HttpsError(INVALID_ARGUMENT, message);
@@ -55,6 +45,7 @@ module.exports = async (data, context, { functions, db, admin }) => {
     .auth()
     .createUser({ email, password })
     .then(async (res) => {
+      await admin.auth().setCustomUserClaims(res.uid, { role: 'user' });
       await invitationsRef.doc(invitationDoc.id).update({ invitationStatus: INVITATION_STATUS[1] });
       return res;
     })

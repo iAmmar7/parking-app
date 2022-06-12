@@ -10,7 +10,7 @@ const { validateToggleAdminState } = require('../validations');
  * @param {object} FirebaseRef functions and db reference.
  * @return {object} reservation object.
  */
-module.exports = async (data, context, { functions, db }) => {
+module.exports = async (data, context, { functions, db, admin }) => {
   functions.logger.log('Request payload', data);
 
   if (!context.auth) {
@@ -24,9 +24,8 @@ module.exports = async (data, context, { functions, db }) => {
   const usersRef = db().collection('users');
 
   // Decline if the requester is not an admin
-  const requesterSnapshot = await usersRef.doc(context.auth.uid).get();
-  const requester = requesterSnapshot.data();
-  if (!requester.admin) {
+  const requester = await admin.auth().getUser(context.auth.uid);
+  if (requester.customClaims.role !== 'admin') {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.ONLY_ADMINS);
   }
 
@@ -35,9 +34,15 @@ module.exports = async (data, context, { functions, db }) => {
   if (!userSnapshot.exists) {
     throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.USER_NOT_FOUND);
   }
-  const userDoc = userSnapshot.data();
 
+  const userDoc = userSnapshot.data();
   const newAdminState = { admin: !userDoc.admin };
+
+  if (userDoc.admin) {
+    await admin.auth().setCustomUserClaims(userDoc.id, { role: 'user' });
+  } else {
+    await admin.auth().setCustomUserClaims(userDoc.id, { role: 'admin' });
+  }
   await usersRef.doc(userId).update(newAdminState);
 
   return Object.assign(userDoc, newAdminState);
