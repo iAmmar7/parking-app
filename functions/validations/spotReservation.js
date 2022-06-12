@@ -12,7 +12,7 @@ function validateSpotReservation(payload) {
   const { from, until, parkingSpotId } = payload;
 
   if (isEmpty(until) || isEmpty(from) || isEmpty(parkingSpotId)) {
-    return { isValid: false, message: 'Payload has missing values!' };
+    return { isValid: false, message: 'Request payload has missing values!' };
   }
 
   if (!isValidDateTime(from)) {

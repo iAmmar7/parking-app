@@ -8,6 +8,10 @@ const errors = {
   RESERVATION_NOT_FOUND: 'Reservation spot not found!',
   ALREADY_CANCELED: 'This reservation has already been canceled!',
   RESERVATION_CANCEL_NOT_ALLOWED: 'You are not allowed to cancel this reservation!',
+  EMAIL_ALREADY_EXIST_IN_USERS: 'The given email already exist in users document!',
+  INVITATION_ALREADY_SENT: 'The invitation has already been sent to this email!',
+  ONLY_ADMINS_CAN_INVITE: 'Only admins can invite other users!',
+  LOCATION_NOT_FOUND: 'The given location id does not exist!',
 };
 
 module.exports = errors;

@@ -30,4 +30,9 @@ const isValidDateTime = (date) => {
   return isValid(new Date(date));
 };
 
-module.exports = { isValidDateTime, isNull, isUndefined, isArray, isObject, isEmpty };
+const isValidEmail = (email) => {
+  const regx = /\S+@\S+\.\S+/;
+  return regx.test(email);
+};
+
+module.exports = { isValidDateTime, isNull, isUndefined, isArray, isObject, isEmpty, isValidEmail };

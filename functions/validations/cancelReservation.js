@@ -9,7 +9,7 @@ function validateCancelReservation(payload) {
   const { reservationId } = payload;
 
   if (isEmpty(reservationId)) {
-    return { isValid: false, message: 'Payload has missing values!' };
+    return { isValid: false, message: 'Request payload has missing values!' };
   }
 
   return { isValid: true, message: null };

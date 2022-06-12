@@ -4,4 +4,6 @@ module.exports = {
   INVALID_ARGUMENT: 'invalid-argument',
   NO_PERMISSION: 'permission-denied',
   UNKNOWN: 'unknown',
+  ALREADY_EXIST: 'already-exists',
+  INVITATION_STATUS: ['PENDING', 'ACCEPTED'],
 };

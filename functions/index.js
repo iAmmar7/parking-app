@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 const { REGION } = require('./utils/constants');
-const { testFunction, testAuthFunction, spotReservation, cancelReservation } = require('./functions');
+const { testFunction, testAuthFunction, spotReservation, cancelReservation, createInvitation } = require('./functions');
 const { createUserEntry } = require('./triggers');
 
 admin.initializeApp();
@@ -25,6 +25,10 @@ exports.spotReservation = functions.region(REGION).https.onCall(async (data, con
 
 exports.cancelReservation = functions.region(REGION).https.onCall(async (data, context) => {
   return cancelReservation(data, context, { functions, db });
+});
+
+exports.createInvitation = functions.region(REGION).https.onCall(async (data, context) => {
+  return createInvitation(data, context, { functions, db });
 });
 
 /**
