@@ -2,12 +2,14 @@ const validateSpotReservation = require('./spotReservation');
 const validateCancelReservation = require('./cancelReservation');
 const validateCreateInvitation = require('./createInvitation');
 const validateCreateUserThroughInvitation = require('./createUserThroughInvitation');
-const addBlockedDaysToParkingSpot = require('./addBlockedDaysToParkingSpot');
+const validateAddBlockedDaysToParkingSpot = require('./addBlockedDaysToParkingSpot');
+const validateToggleAdminState = require('./toggleAdminState');
 
 module.exports = {
   validateSpotReservation,
   validateCancelReservation,
   validateCreateInvitation,
   validateCreateUserThroughInvitation,
-  addBlockedDaysToParkingSpot,
+  validateAddBlockedDaysToParkingSpot,
+  validateToggleAdminState,
 };

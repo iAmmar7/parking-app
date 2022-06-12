@@ -17,6 +17,7 @@ const errors = {
   RESERVATION_EXIST_ON_BLOCKED_DAYS: 'There are reservations on one or more blocked days!',
   BLOCKED_SPOT: 'The parking spot is blocked on this day!',
   ONLY_ADMINS: 'Only admins can perform this operation!',
+  USER_NOT_FOUND: 'No user found against the given id!',
 };
 
 module.exports = errors;
