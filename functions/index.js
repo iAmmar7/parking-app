@@ -53,7 +53,7 @@ exports.toggleAdminState = functions.region(REGION).https.onCall((data, context)
   return toggleAdminState(data, context, { functions, db, admin });
 });
 
-exports.deleteUser = functions.region(REGION).https.onRequest(async (data, context) => {
+exports.deleteUser = functions.region(REGION).https.onCall((data, context) => {
   return deleteUser(data, context, { functions, db, admin });
 });
 
