@@ -1,4 +1,4 @@
-const { UNAUTHENTICATED, INVALID_ARGUMENT } = require('../utils/constants');
+const { UNAUTHENTICATED, INVALID_ARGUMENT, NO_PERMISSION } = require('../utils/constants');
 const errorMessage = require('../utils/errors');
 const { first, last } = require('../utils/helpers');
 const { addBlockedDaysToParkingSpot } = require('../validations');
@@ -22,8 +22,16 @@ module.exports = async (data, context, { functions, db }) => {
   if (!isValid) throw new functions.https.HttpsError(INVALID_ARGUMENT, message);
 
   const { parkingSpotId, blockedOn } = data;
+  const usersRef = db().collection('users');
   const spotRef = db().collection('parkingspots');
   const reservedRef = db().collection('reservations');
+
+  // Decline if the inviter is not an admin
+  const inviterSnapshot = await usersRef.doc(context.auth.uid).get();
+  const inviter = inviterSnapshot.data();
+  if (!inviter.admin) {
+    throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.ONLY_ADMINS);
+  }
 
   const spotDoc = await spotRef.doc(parkingSpotId).get();
   if (!spotDoc.exists) {
