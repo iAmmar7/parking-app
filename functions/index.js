@@ -11,6 +11,7 @@ const {
   createUserThroughInvitation,
   addBlockedDaysToParkingSpot,
   toggleAdminState,
+  deleteUser,
 } = require('./functions');
 const { createUserEntry } = require('./triggers');
 
@@ -18,7 +19,7 @@ admin.initializeApp();
 const db = admin.firestore;
 
 /**
- * @Functions: 8
+ * @Functions: 9
  */
 exports.testFunction = functions.region(REGION).https.onCall((data, context) => {
   return testFunction(data, context, { functions, db });
@@ -50,6 +51,10 @@ exports.addBlockedDaysToParkingSpot = functions.region(REGION).https.onCall((dat
 
 exports.toggleAdminState = functions.region(REGION).https.onCall((data, context) => {
   return toggleAdminState(data, context, { functions, db, admin });
+});
+
+exports.deleteUser = functions.region(REGION).https.onRequest(async (data, context) => {
+  return deleteUser(data, context, { functions, db, admin });
 });
 
 /**

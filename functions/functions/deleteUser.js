@@ -40,7 +40,7 @@ module.exports = async (data, context, { functions, db, admin }) => {
 
   await admin.auth().deleteUser(userData.id);
 
-  const batch = db.batch();
+  const batch = db().batch();
 
   const reservedSnapshot = await reservationsRef
     .where('userId', '==', userId)
