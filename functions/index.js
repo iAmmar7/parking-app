@@ -9,6 +9,7 @@ const {
   cancelReservation,
   createInvitation,
   createUserThroughInvitation,
+  addBlockedDaysToParkingSpot,
 } = require('./functions');
 const { createUserEntry } = require('./triggers');
 
@@ -40,6 +41,10 @@ exports.createInvitation = functions.region(REGION).https.onCall(async (data, co
 
 exports.createUserThroughInvitation = functions.region(REGION).https.onCall(async (data, context) => {
   return createUserThroughInvitation(data, context, { functions, db, admin });
+});
+
+exports.addBlockedDaysToParkingSpot = functions.region(REGION).https.onCall(async (data, context) => {
+  return addBlockedDaysToParkingSpot(data, context, { functions, db });
 });
 
 /**

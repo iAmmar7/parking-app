@@ -35,4 +35,14 @@ const isValidEmail = (email) => {
   return regx.test(email);
 };
 
-module.exports = { isValidDateTime, isNull, isUndefined, isArray, isObject, isEmpty, isValidEmail };
+const first = (arr) => {
+  if (!isArray(arr)) return;
+  return arr[0];
+};
+
+const last = (arr) => {
+  if (!isArray(arr)) return;
+  return arr[arr.length - 1];
+};
+
+module.exports = { isValidDateTime, isNull, isUndefined, isArray, isObject, isEmpty, isValidEmail, first, last };

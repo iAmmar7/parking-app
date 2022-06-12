@@ -14,6 +14,8 @@ const errors = {
   LOCATION_NOT_FOUND: 'The given location id does not exist!',
   INVITATION_NOT_FOUND: 'No invitation has been sent to this user!',
   INVITATION_KEYS_MISMATCH: 'Invitation key does not match with the stored key!',
+  RESERVATION_EXIST_ON_BLOCKED_DAYS: 'There are reservations on one or more blocked days!',
+  BLOCKED_SPOT: 'The parking spot is blocked on this day!',
 };
 
 module.exports = errors;

@@ -9,11 +9,11 @@ const errorMessage = require('../utils/errors');
 const { validateCreateUserThroughInvitation } = require('../validations');
 
 /**
- * Create a user invitation and email document
+ * Create an auth user through invitation key and update the invitation.
  * @auth required
  * @param {object} data The request payload.
  * @param {object} context The firebase context.
- * @param {object} FirebaseRef functions and db reference.
+ * @param {object} FirebaseRef functions, db, and admin reference.
  * @return {object} inivitation object.
  */
 module.exports = async (data, context, { functions, db, admin }) => {

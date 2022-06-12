@@ -1,3 +1,4 @@
+const isSameDay = require('date-fns/isSameDay');
 const areIntervalsOverlapping = require('date-fns/areIntervalsOverlapping');
 
 const { UNAUTHENTICATED, INVALID_ARGUMENT, NO_PERMISSION } = require('../utils/constants');
@@ -27,6 +28,9 @@ module.exports = async (data, context, { functions, db }) => {
   const parkingRef = db().collection('parkingspots');
   const reservedRef = db().collection('reservations');
 
+  const fromDate = new Date(from);
+  const untilDate = new Date(until);
+
   const spotDoc = await parkingRef.doc(parkingSpotId).get();
   if (!spotDoc.exists) {
     throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.PARKING_NOT_FOUND);
@@ -38,10 +42,19 @@ module.exports = async (data, context, { functions, db }) => {
   if (!isEmpty(parkingSpot.alwaysReservedForIds) && !parkingSpot.alwaysReservedForIds.includes(context.auth.uid)) {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.PERMANENT_RESERVATION);
   }
+  if (!isEmpty(parkingSpot.blockedOn)) {
+    const blockedDays = parkingSpot.blockedOn;
+    for (let i = 0; i < blockedDays.length; i++) {
+      const blockedDay = new Date(blockedDays[i]);
+      if (isSameDay(fromDate, new Date(blockedDay)) || isSameDay(untilDate, blockedDay)) {
+        throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.BLOCKED_SPOT);
+      }
+    }
+  }
 
-  const startOfDay = new Date(from);
+  const startOfDay = fromDate;
   startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(until);
+  const endOfDay = untilDate;
   endOfDay.setHours(23, 59, 59, 999);
 
   const reservedSnapshot = await reservedRef
@@ -60,12 +73,10 @@ module.exports = async (data, context, { functions, db }) => {
     for (let i = 0; i < reservedSpots.length; i++) {
       const docFrom = reservedSpots[i].from.toDate();
       const docUntil = reservedSpots[i].until.toDate();
-      const requestFrom = new Date(from);
-      const requestUntil = new Date(until);
 
       const isOverLapping = areIntervalsOverlapping(
         { start: docFrom, end: docUntil },
-        { start: requestFrom, end: requestUntil },
+        { start: fromDate, end: untilDate },
       );
       if (!reservedSpots[i].canceled && isOverLapping) {
         return {
@@ -80,8 +91,8 @@ module.exports = async (data, context, { functions, db }) => {
     canceled: false,
     isHandicappedParking: false,
     createdAt: db.Timestamp.fromDate(new Date()),
-    from: db.Timestamp.fromDate(new Date(from)),
-    until: db.Timestamp.fromDate(new Date(until)),
+    from: db.Timestamp.fromDate(fromDate),
+    until: db.Timestamp.fromDate(untilDate),
     label: parkingSpot.parkingSpotNumber && parkingSpot.parkingSpotNumber.toString(),
     locationId: parkingSpot.locationId,
     parkingSpotId: parkingSpot.id,

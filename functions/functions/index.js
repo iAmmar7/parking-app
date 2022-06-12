@@ -4,6 +4,7 @@ const spotReservation = require('./spotReservation');
 const cancelReservation = require('./cancelReservation');
 const createInvitation = require('./createInvitation');
 const createUserThroughInvitation = require('./createUserThroughInvitation');
+const addBlockedDaysToParkingSpot = require('./addBlockedDaysToParkingSpot');
 
 module.exports = {
   testFunction,
@@ -12,4 +13,5 @@ module.exports = {
   cancelReservation,
   createInvitation,
   createUserThroughInvitation,
+  addBlockedDaysToParkingSpot,
 };
