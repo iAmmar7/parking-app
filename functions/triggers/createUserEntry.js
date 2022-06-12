@@ -10,5 +10,6 @@ module.exports = (db, user) => {
     id: user.uid,
     firstName: '',
     lastName: '',
+    admin: false,
   });
 };

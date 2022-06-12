@@ -2,14 +2,21 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 const { REGION } = require('./utils/constants');
-const { testFunction, testAuthFunction, spotReservation, cancelReservation, createInvitation } = require('./functions');
+const {
+  testFunction,
+  testAuthFunction,
+  spotReservation,
+  cancelReservation,
+  createInvitation,
+  createUserThroughInvitation,
+} = require('./functions');
 const { createUserEntry } = require('./triggers');
 
 admin.initializeApp();
 const db = admin.firestore;
 
 /**
- * @Functions: 4
+ * @Functions: 6
  */
 exports.testFunction = functions.region(REGION).https.onCall((data, context) => {
   return testFunction(data, context, { functions, db });
@@ -29,6 +36,10 @@ exports.cancelReservation = functions.region(REGION).https.onCall(async (data, c
 
 exports.createInvitation = functions.region(REGION).https.onCall(async (data, context) => {
   return createInvitation(data, context, { functions, db });
+});
+
+exports.createUserThroughInvitation = functions.region(REGION).https.onCall(async (data, context) => {
+  return createUserThroughInvitation(data, context, { functions, db, admin });
 });
 
 /**

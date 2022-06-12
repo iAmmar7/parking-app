@@ -12,6 +12,8 @@ const errors = {
   INVITATION_ALREADY_SENT: 'The invitation has already been sent to this email!',
   ONLY_ADMINS_CAN_INVITE: 'Only admins can invite other users!',
   LOCATION_NOT_FOUND: 'The given location id does not exist!',
+  INVITATION_NOT_FOUND: 'No invitation has been sent to this user!',
+  INVITATION_KEYS_MISMATCH: 'Invitation key does not match with the stored key!',
 };
 
 module.exports = errors;

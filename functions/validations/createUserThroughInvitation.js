@@ -1,14 +1,14 @@
 const { isEmpty, isValidEmail } = require('../utils/helpers');
 
 /**
- * Validate the createInvitation function request.
+ * Validate the createUserThroughInvitation function request.
  * @param {object} payload The request payload.
  * @return {object} The validity flag with error message or null.
  */
-function validateCreateInvitation(payload) {
-  const { email, name, key, locationId, templateName } = payload;
+function validateCreateUserThroughInvitation(payload) {
+  const { email, key, password } = payload;
 
-  if (isEmpty(email) || isEmpty(name) || isEmpty(key) || isEmpty(locationId) || isEmpty(templateName)) {
+  if (isEmpty(email) || isEmpty(key) || isEmpty(password)) {
     return { isValid: false, message: 'Request payload has missing values!' };
   }
 
@@ -19,4 +19,4 @@ function validateCreateInvitation(payload) {
   return { isValid: true, message: null };
 }
 
-module.exports = validateCreateInvitation;
+module.exports = validateCreateUserThroughInvitation;
