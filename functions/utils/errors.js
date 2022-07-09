@@ -1,4 +1,6 @@
-const errors = {
+const { LOCALE } = require('./constants');
+
+const errorsInEn = {
   NOT_AUTHORIZED: 'You are not authorized!',
   PARKING_NOT_FOUND: 'The given parking spot does not exist!',
   DISABLED_PARKING_SPOT: 'The parking spot is either inactive or disabled!',
@@ -19,5 +21,29 @@ const errors = {
   ONLY_ADMINS: 'Only admins can perform this operation!',
   USER_NOT_FOUND: 'No user found against the given id!',
 };
+
+const errorsInDe = {
+  NOT_AUTHORIZED: 'Sie sind nicht autorisiert!',
+  PARKING_NOT_FOUND: 'Der angegebene Parkplatz existiert nicht!',
+  DISABLED_PARKING_SPOT: 'Der Parkplatz ist entweder inaktiv oder deaktiviert!',
+  PERMANENT_RESERVATION: 'Der Parkplatz ist dauerhaft für jemand anderen reserviert!',
+  TIME_OVERLAPPING: 'Die Zeit überschneidet sich mit anderen Reservierungen!',
+  SOMETHING_WENT_WRONG: 'Hoppla! Etwas ist schief gelaufen!',
+  RESERVATION_NOT_FOUND: 'Reservierungsplatz nicht gefunden!',
+  ALREADY_CANCELED: 'Diese Reservierung wurde bereits storniert!',
+  RESERVATION_CANCEL_NOT_ALLOWED: 'Sie dürfen diese Reservierung nicht stornieren!',
+  EMAIL_ALREADY_EXIST_IN_USERS: 'Die angegebene E-Mail existiert bereits im Benutzerdokument!',
+  INVITATION_ALREADY_SENT: 'Die Einladung wurde bereits an diese E-Mail gesendet!',
+  ONLY_ADMINS_CAN_INVITE: 'Nur Administratoren können andere Benutzer einladen!',
+  LOCATION_NOT_FOUND: 'Die angegebene Standort-ID existiert nicht!',
+  INVITATION_NOT_FOUND: 'An diesen Benutzer wurde keine Einladung gesendet!',
+  INVITATION_KEYS_MISMATCH: 'Einladungsschlüssel stimmt nicht mit dem gespeicherten Schlüssel überein!',
+  RESERVATION_EXIST_ON_BLOCKED_DAYS: 'Es gibt Reservierungen an einem oder mehreren gesperrten Tagen!',
+  BLOCKED_SPOT: 'Der Parkplatz ist an diesem Tag gesperrt!',
+  ONLY_ADMINS: 'Nur Administratoren können diesen Vorgang ausführen!',
+  USER_NOT_FOUND: 'Kein Benutzer mit der angegebenen ID gefunden!',
+};
+
+const errors = LOCALE === 'de' ? errorsInDe : errorsInEn;
 
 module.exports = errors;
