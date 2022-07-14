@@ -41,10 +41,17 @@ module.exports = async (data, context, { functions, db }) => {
     throw new functions.https.HttpsError(NO_PERMISSION, errorMessage.ONLY_ADMINS_CAN_INVITE);
   }
 
-  // Decline if the invitee already has an account
+  // Decline if the invitee already has an account and it is active
   const inviteeSnapshot = await usersRef.where('email', '==', email).get();
   if (inviteeSnapshot.size > 0) {
-    throw new functions.https.HttpsError(ALREADY_EXIST, errorMessage.EMAIL_ALREADY_EXIST_IN_USERS);
+    const invitees = [];
+    inviteeSnapshot.forEach((doc) => {
+      const docData = doc.data();
+      invitees.push(docData);
+    });
+    if (invitees[0].active) {
+      throw new functions.https.HttpsError(ALREADY_EXIST, errorMessage.EMAIL_ALREADY_EXIST_IN_USERS);
+    }
   }
 
   // Decline if the location does not exist in db

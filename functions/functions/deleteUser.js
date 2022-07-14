@@ -38,8 +38,6 @@ module.exports = async (data, context, { functions, db, admin }) => {
     throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.USER_NOT_FOUND);
   }
 
-  await admin.auth().deleteUser(userData.id);
-
   const batch = db().batch();
 
   const reservedSnapshot = await reservationsRef
@@ -57,6 +55,8 @@ module.exports = async (data, context, { functions, db, admin }) => {
   batch.update(deactivatedUserRef, { active: false });
 
   await batch.commit();
+
+  await admin.auth().updateUser(userData.id, { disabled: true });
 
   return Object.assign(userData, { active: false });
 };
