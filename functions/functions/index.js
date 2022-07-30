@@ -7,6 +7,7 @@ const createUserThroughInvitation = require('./createUserThroughInvitation');
 const addBlockedDaysToParkingSpot = require('./addBlockedDaysToParkingSpot');
 const toggleAdminState = require('./toggleAdminState');
 const deleteUser = require('./deleteUser');
+const enableUser = require('./enableUser');
 
 module.exports = {
   testFunction,
@@ -18,4 +19,5 @@ module.exports = {
   addBlockedDaysToParkingSpot,
   toggleAdminState,
   deleteUser,
+  enableUser,
 };

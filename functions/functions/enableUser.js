@@ -1,6 +1,6 @@
 const { UNAUTHENTICATED, INVALID_ARGUMENT, NO_PERMISSION } = require('../utils/constants');
 const errorMessage = require('../utils/errors');
-const { validateDeleteUser } = require('../validations');
+const { validateEnableUser } = require('../validations');
 
 /**
  * Delete the user and future reservation.
@@ -17,12 +17,11 @@ module.exports = async (data, context, { functions, db, admin }) => {
     throw new functions.https.HttpsError(UNAUTHENTICATED, errorMessage.NOT_AUTHORIZED);
   }
 
-  const { isValid, message } = validateDeleteUser(data);
+  const { isValid, message } = validateEnableUser(data);
   if (!isValid) throw new functions.https.HttpsError(INVALID_ARGUMENT, message);
 
   const { userId } = data;
   const usersRef = db().collection('users');
-  const reservationsRef = db().collection('reservations');
 
   // Decline if the requester is not an admin
   const requesterSnapshot = await usersRef.doc(context.auth.uid).get();
@@ -38,25 +37,9 @@ module.exports = async (data, context, { functions, db, admin }) => {
     throw new functions.https.HttpsError(INVALID_ARGUMENT, errorMessage.USER_NOT_FOUND);
   }
 
-  const batch = db().batch();
+  await usersRef.doc(userData.id).update({ active: true });
 
-  const reservedSnapshot = await reservationsRef
-    .where('userId', '==', userId)
-    .where('canceled', '==', false)
-    .where('from', '>', db.Timestamp.fromDate(new Date()))
-    .get();
+  await admin.auth().updateUser(userData.id, { disabled: false });
 
-  reservedSnapshot.forEach((doc) => {
-    const canceledReservationRef = reservationsRef.doc(doc.id);
-    batch.update(canceledReservationRef, { canceled: true });
-  });
-
-  const deactivatedUserRef = usersRef.doc(userId);
-  batch.update(deactivatedUserRef, { active: false });
-
-  await batch.commit();
-
-  await admin.auth().updateUser(userData.id, { disabled: true });
-
-  return Object.assign(userData, { active: false });
+  return Object.assign(userData, { active: true });
 };

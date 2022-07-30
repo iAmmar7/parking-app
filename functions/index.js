@@ -12,6 +12,7 @@ const {
   addBlockedDaysToParkingSpot,
   toggleAdminState,
   deleteUser,
+  enableUser,
 } = require('./functions');
 const { createUserEntry } = require('./triggers');
 
@@ -19,7 +20,7 @@ admin.initializeApp();
 const db = admin.firestore;
 
 /**
- * @Functions: 9
+ * @Functions: 10
  */
 exports.testFunction = functions.region(REGION).https.onCall((data, context) => {
   return testFunction(data, context, { functions, db });
@@ -55,6 +56,10 @@ exports.toggleAdminState = functions.region(REGION).https.onCall((data, context)
 
 exports.deleteUser = functions.region(REGION).https.onCall((data, context) => {
   return deleteUser(data, context, { functions, db, admin });
+});
+
+exports.enableUser = functions.region(REGION).https.onCall((data, context) => {
+  return enableUser(data, context, { functions, db, admin });
 });
 
 /**
