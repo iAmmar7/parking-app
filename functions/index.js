@@ -32,7 +32,7 @@ exports.testAuthFunction = functions.region(REGION).https.onCall((data, context)
 
 exports.spotReservation = functions
   .runWith({
-    timeoutSeconds: 120,
+    timeoutSeconds: 180,
   })
   .region(REGION)
   .https.onCall((data, context) => {
