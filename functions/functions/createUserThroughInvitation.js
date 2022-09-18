@@ -16,7 +16,7 @@ module.exports = async (data, context, { functions, db, admin }) => {
   const { isValid, message } = validateCreateUserThroughInvitation(data);
   if (!isValid) throw new functions.https.HttpsError(INVALID_ARGUMENT, message);
 
-  const { email, key, password } = data;
+  const { email, key, password, firstName, lastName } = data;
   const usersRef = db().collection('users');
   const invitationsRef = db().collection('invitations');
 
@@ -57,9 +57,9 @@ module.exports = async (data, context, { functions, db, admin }) => {
     return { user: Object.assign(user, { active: true }) };
   }
 
-  admin
+  return admin
     .auth()
-    .createUser({ email, password })
+    .createUser({ email, password, displayName: `${firstName}/${lastName}` })
     .then(async (res) => {
       await admin.auth().setCustomUserClaims(res.uid, { role: 'user' });
       await invitationsRef.doc(invitationDoc.id).update({ invitationStatus: INVITATION_STATUS[1] });

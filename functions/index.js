@@ -30,17 +30,27 @@ exports.testAuthFunction = functions.region(REGION).https.onCall((data, context)
   return testAuthFunction(data, context, { functions, db });
 });
 
-exports.spotReservation = functions.region(REGION).https.onCall((data, context) => {
-  return spotReservation(data, context, { functions, db });
-});
+exports.spotReservation = functions
+  .runWith({
+    timeoutSeconds: 120,
+  })
+  .region(REGION)
+  .https.onCall((data, context) => {
+    return spotReservation(data, context, { functions, db });
+  });
 
 exports.cancelReservation = functions.region(REGION).https.onCall((data, context) => {
   return cancelReservation(data, context, { functions, db });
 });
 
-exports.createInvitation = functions.region(REGION).https.onCall((data, context) => {
-  return createInvitation(data, context, { functions, db });
-});
+exports.createInvitation = functions
+  .runWith({
+    timeoutSeconds: 120,
+  })
+  .region(REGION)
+  .https.onCall((data, context) => {
+    return createInvitation(data, context, { functions, db });
+  });
 
 exports.createUserThroughInvitation = functions.region(REGION).https.onCall((data, context) => {
   return createUserThroughInvitation(data, context, { functions, db, admin });
